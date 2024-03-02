@@ -1,2 +1,20 @@
-package lms.service;public interface LessonService {
+package lms.service;
+
+import lms.dto.request.EditLessonRequest;
+import lms.dto.request.SaveLessonRequest;
+import lms.dto.response.AllLessonsResponse;
+import lms.dto.response.SimpleResponse;
+
+import java.util.List;
+
+public interface LessonService {
+    List<AllLessonsResponse> findAll();
+
+    SimpleResponse saveLesson(Long courseId, SaveLessonRequest saveLessonRequest);
+
+    AllLessonsResponse findById(Long lessonId);
+
+    SimpleResponse updateLesson(Long lessonId, EditLessonRequest editLessonRequest);
+
+    SimpleResponse deleteById(Long lessonId);
 }

@@ -1,2 +1,12 @@
-package lms.dto.request;public record SaveStudentRequest() {
+package lms.dto.request;
+
+import lms.entities.enums.StudyFormat;
+
+public record SaveStudentRequest(
+        String lastName,
+        String firstName,
+        String phoneNumber,
+        String email,
+        StudyFormat studyFormat
+) {
 }

@@ -1,4 +1,4 @@
-package lms.enums;
+package lms.entities.enums;
 
 public enum Specialization {
     JAVA,

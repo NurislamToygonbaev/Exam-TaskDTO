@@ -1,2 +1,6 @@
-package lms.dto.request;public record SaveLessonRequest() {
+package lms.dto.request;
+
+public record SaveLessonRequest(
+        String lessonName
+) {
 }
