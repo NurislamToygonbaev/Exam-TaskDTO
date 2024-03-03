@@ -35,7 +35,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public SimpleResponse saveGroup(SaveGroupRequest saveGroupRequest) {
         List<Long> courseIds = saveGroupRequest.courseIds();
-        List<Course> courses = courseRepo.findCoursesWithIds(courseIds);
+        List<Course> courses = courseRepo. findCoursesWithIds(courseIds);
         Group group = new Group();
         group.setGroupName(saveGroupRequest.groupName());
         group.setImageLink(saveGroupRequest.imageLink());
@@ -56,25 +56,41 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public SimpleResponse updateGroup(Long groupId, EditGroupRequest editGroupRequest) {
-        Group group = checkId(groupId);
-        List<Long> courseIds = editGroupRequest.courseIds();
-        List<Course> courses = courseRepo.findCoursesWithIds(courseIds);
-        group.setGroupName(editGroupRequest.groupName());
-        group.setImageLink(editGroupRequest.imageLink());
-        group.setDescription(editGroupRequest.description());
-        group.setCourses(courses);
-        for (Course course : courses) {
-            course.addGroup(group);
+        try {
+            Group group = checkId(groupId);
+            List<Long> courseIds = editGroupRequest.courseIds();
+            List<Course> courses = courseRepo.findCoursesWithIds(courseIds);
+            group.setGroupName(editGroupRequest.groupName());
+            group.setImageLink(editGroupRequest.imageLink());
+            group.setDescription(editGroupRequest.description());
+            group.setCourses(courses);
+            for (Course course : courses) {
+                course.addGroup(group);
+            }
+            groupRepo.save(group);
+            return new SimpleResponse(HttpStatus.OK, "successfully updated");
+        }catch (Exception e){
+            return SimpleResponse
+                    .builder()
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .message(e.getMessage())
+                    .build();
         }
-        groupRepo.save(group);
-        return new SimpleResponse(HttpStatus.OK, "successfully updated");
     }
 
     @Override
     public SimpleResponse deleteById(Long groupId) {
-        Group group = checkId(groupId);
-        groupRepo.delete(group);
-        return new SimpleResponse(HttpStatus.OK, "successfully deleted");
+        try {
+            Group group = checkId(groupId);
+            groupRepo.delete(group);
+            return new SimpleResponse(HttpStatus.OK, "successfully deleted");
+        }catch (Exception e){
+            return SimpleResponse
+                    .builder()
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .message(e.getMessage())
+                    .build();
+        }
     }
 
     @Override

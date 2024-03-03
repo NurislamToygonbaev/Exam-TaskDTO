@@ -50,7 +50,7 @@ public class CompanyServiceImpl implements CompanyService {
             company.setPhoneNumber(saveCompanyRequest.phoneNumber());
             companyRepo.save(company);
             return new SimpleResponse(HttpStatus.OK, "Successfully saved");
-        } catch (MyException e) {
+        } catch (Exception e) {
             return SimpleResponse.builder()
                     .httpStatus(HttpStatus.NOT_FOUND)
                     .message(e.getMessage())
@@ -65,7 +65,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public SimpleResponse updateCompany(Long companyId, EditCompanyRequest editCompany){
+    public SimpleResponse updateCompany(Long companyId, EditCompanyRequest editCompany) {
         try {
             checkName(editCompany.name());
             Company company = checkId(companyId);
@@ -75,7 +75,7 @@ public class CompanyServiceImpl implements CompanyService {
             company.setPhoneNumber(editCompany.phoneNumber());
             companyRepo.save(company);
             return new SimpleResponse(HttpStatus.OK, "Successfully updated");
-        }catch (MyException e){
+        } catch (Exception e) {
             return SimpleResponse.builder()
                     .httpStatus(HttpStatus.NOT_FOUND)
                     .message(e.getMessage())
@@ -85,16 +85,22 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public SimpleResponse deleteCompanyById(Long companyId) {
-        Company company = checkId(companyId);
-        companyRepo.delete(company);
-        return new SimpleResponse(HttpStatus.OK, "Successfully deleted");
+        try {
+            Company company = checkId(companyId);
+            companyRepo.delete(company);
+            return new SimpleResponse(HttpStatus.OK, "Successfully deleted");
+        }catch (Exception e){
+            return SimpleResponse
+                    .builder()
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .message(e.getMessage())
+                    .build();
+        }
     }
 
     @Override
     public CompanyWithInfo companyWithInfo(Long companyId) {
         Company company = checkId(companyId);
-
-
 
         CompanyWithInfo companyWithInfo = companyRepo.companyWithInfo(companyId);
 
@@ -102,14 +108,15 @@ public class CompanyServiceImpl implements CompanyService {
         for (Instructor instructor : company.getInstructors()) {
             companyWithInfo.addInstructorsName(instructor.getFirstName());
         }
+        int count = 0;
         for (Course course : company.getCourses()) {
             companyWithInfo.addCourseNames(course.getCourseName());
             for (Group group : course.getGroups()) {
                 companyWithInfo.addGroupName(group.getGroupName());
-                long countOfStudentsInGroup = group.getStudents().size();
-                companyWithInfo.setCountOfStudents((int) countOfStudentsInGroup);
+                count += group.getStudents().size();
             }
         }
+        companyWithInfo.setCountOfStudents(count);
         return companyWithInfo;
     }
 }

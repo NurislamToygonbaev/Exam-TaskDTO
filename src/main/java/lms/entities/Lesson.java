@@ -25,7 +25,7 @@ public class Lesson {
     @ManyToOne
     private Course course;
 
-    @OneToMany(mappedBy = "lesson")
+    @OneToMany(mappedBy = "lesson", cascade = CascadeType.REMOVE)
     private List<Task> tasks;
 
     public void addTask(Task task){

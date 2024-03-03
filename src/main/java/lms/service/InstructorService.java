@@ -24,4 +24,6 @@ public interface InstructorService {
     Integer countStudentsOfGroup(Long inId);
 
     InstructorInfosResponse instructorWIthInfos(Long inId);
+
+    SimpleResponse assignInToCourse(Long courseId, Long inId);
 }

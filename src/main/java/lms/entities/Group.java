@@ -25,10 +25,10 @@ public class Group {
     private String imageLink;
     private String description;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.DETACH)
     private List<Course> courses;
 
-    @OneToMany(mappedBy = "group")
+    @OneToMany(mappedBy = "group", cascade = CascadeType.REMOVE)
     private List<Student> students;
 
     public void addCourse(Course course){

@@ -26,10 +26,10 @@ public class Instructor {
     @Enumerated(EnumType.STRING)
     private Specialization specialization;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.DETACH)
     private List<Company> companies;
 
-    @OneToMany(mappedBy = "instructor")
+    @OneToMany(mappedBy = "instructor", cascade = CascadeType.REMOVE)
     private List<Course> courses;
 
     public void addCompany(Company company){

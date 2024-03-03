@@ -56,4 +56,10 @@ public class InstructorApi {
     public InstructorInfosResponse instructorWithInfos(@PathVariable Long inId){
         return instructorService.instructorWIthInfos(inId);
     }
+
+    @PostMapping("/assignToCourse/{courseId}/{inId}")
+    public SimpleResponse assignIntoCourse(@PathVariable Long courseId,
+                                           @PathVariable Long inId){
+        return instructorService.assignInToCourse(courseId, inId);
+    }
 }

@@ -28,13 +28,13 @@ public class Course {
     @ManyToOne
     private Company company;
 
-    @ManyToMany(mappedBy = "courses")
+    @ManyToMany(mappedBy = "courses", cascade = CascadeType.DETACH)
     private List<Group> groups;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.DETACH)
     private Instructor instructor;
 
-    @OneToMany(mappedBy = "course")
+    @OneToMany(mappedBy = "course", cascade = CascadeType.REMOVE)
     private List<Lesson> lessons;
 
 

@@ -26,6 +26,6 @@ public class Student {
     private StudyFormat studyFormat;
     private boolean block = true;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.DETACH)
     private Group group;
 }

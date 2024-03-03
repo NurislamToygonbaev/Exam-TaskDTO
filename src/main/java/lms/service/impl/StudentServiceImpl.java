@@ -82,7 +82,7 @@ public class StudentServiceImpl implements StudentService {
             student.setLastName(editStudentRequest.lastName());
             studentRepo.save(student);
             return new SimpleResponse(HttpStatus.OK, "successfully saved");
-        } catch (MyException e) {
+        } catch (Exception e) {
             return SimpleResponse.builder()
                     .httpStatus(HttpStatus.NOT_FOUND)
                     .message("error")
@@ -92,21 +92,37 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public SimpleResponse deleteById(Long studentId) {
-        Student student = checkId(studentId);
-        studentRepo.delete(student);
-        return new SimpleResponse(HttpStatus.OK, "successfully deleted");
+        try {
+            Student student = checkId(studentId);
+            studentRepo.delete(student);
+            return new SimpleResponse(HttpStatus.OK, "successfully deleted");
+        }catch (Exception e){
+            return SimpleResponse
+                    .builder()
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .message(e.getMessage())
+                    .build();
+        }
     }
 
     @Override
     @Transactional
     public SimpleResponse assignStudentToGroup(Long groupId, Long studentId) {
-        Student student = checkId(studentId);
-        Group group = groupRepo.findById(groupId)
-                .orElseThrow(() ->
-                        new NoSuchElementException("Group with id: " + groupId + " not found"));
-        student.setGroup(group);
-        group.addStudent(student);
-        return new SimpleResponse(HttpStatus.OK, "successfully assigned");
+        try {
+            Student student = checkId(studentId);
+            Group group = groupRepo.findById(groupId)
+                    .orElseThrow(() ->
+                            new NoSuchElementException("Group with id: " + groupId + " not found"));
+            student.setGroup(group);
+            group.addStudent(student);
+            return new SimpleResponse(HttpStatus.OK, "successfully assigned");
+        }catch (Exception e){
+            return SimpleResponse
+                    .builder()
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .message(e.getMessage())
+                    .build();
+        }
     }
 
     @Override
@@ -116,14 +132,22 @@ public class StudentServiceImpl implements StudentService {
 
     @Override @Transactional
     public SimpleResponse blockStudent(Long studentId) {
-        Student student = checkId(studentId);
-        boolean block = student.isBlock();
-        if (block){
-            student.setBlock(false);
-            return new SimpleResponse(HttpStatus.OK, "successfully blocked");
-        }else {
-            student.setBlock(true);
-            return new SimpleResponse(HttpStatus.OK, "successfully unBlocked");
+        try {
+            Student student = checkId(studentId);
+            boolean block = student.isBlock();
+            if (block){
+                student.setBlock(false);
+                return new SimpleResponse(HttpStatus.OK, "successfully blocked");
+            }else {
+                student.setBlock(true);
+                return new SimpleResponse(HttpStatus.OK, "successfully unBlocked");
+            }
+        }catch (Exception e){
+            return SimpleResponse
+                    .builder()
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .message(e.getMessage())
+                    .build();
         }
     }
 }

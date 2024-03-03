@@ -35,17 +35,25 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public SimpleResponse saveTask(Long lessonId, SaveTaskRequest saveTaskRequest) {
-        Lesson lesson = lessonRepo.findById(lessonId)
-                .orElseThrow(() ->
-                        new NoSuchElementException("Lesson with id: " + lessonId + " not found"));
-        Task task = new Task();
-        task.setTaskName(saveTaskRequest.taskName());
-        task.setTaskText(saveTaskRequest.taskText());
-        task.setDeadLine(saveTaskRequest.deadLine());
-        lesson.addTask(task);
-        task.setLesson(lesson);
-        taskRepo.save(task);
-        return new SimpleResponse(HttpStatus.OK, "successfully saved");
+        try {
+            Lesson lesson = lessonRepo.findById(lessonId)
+                    .orElseThrow(() ->
+                            new NoSuchElementException("Lesson with id: " + lessonId + " not found"));
+            Task task = new Task();
+            task.setTaskName(saveTaskRequest.taskName());
+            task.setTaskText(saveTaskRequest.taskText());
+            task.setDeadLine(saveTaskRequest.deadLine());
+            lesson.addTask(task);
+            task.setLesson(lesson);
+            taskRepo.save(task);
+            return new SimpleResponse(HttpStatus.OK, "successfully saved");
+        }catch (Exception e){
+            return SimpleResponse
+                    .builder()
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .message(e.getMessage())
+                    .build();
+        }
     }
 
     @Override
@@ -56,18 +64,34 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public SimpleResponse updateTask(Long taskId, EditTaskRequest editTaskRequest) {
-        Task task = checkId(taskId);
-        task.setTaskText(editTaskRequest.taskText());
-        task.setTaskName(editTaskRequest.taskName());
-        task.setDeadLine(editTaskRequest.deadLine());
-        taskRepo.save(task);
-        return new SimpleResponse(HttpStatus.OK, "successfully updated");
+        try {
+            Task task = checkId(taskId);
+            task.setTaskText(editTaskRequest.taskText());
+            task.setTaskName(editTaskRequest.taskName());
+            task.setDeadLine(editTaskRequest.deadLine());
+            taskRepo.save(task);
+            return new SimpleResponse(HttpStatus.OK, "successfully updated");
+        }catch (Exception e){
+            return SimpleResponse
+                    .builder()
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .message(e.getMessage())
+                    .build();
+        }
     }
 
     @Override
     public SimpleResponse deleteTask(Long taskId) {
-        Task task = checkId(taskId);
-        taskRepo.delete(task);
-        return new SimpleResponse(HttpStatus.OK, "successfully deleted");
+       try {
+           Task task = checkId(taskId);
+           taskRepo.delete(task);
+           return new SimpleResponse(HttpStatus.OK, "successfully deleted");
+       }catch (Exception e){
+           return SimpleResponse
+                   .builder()
+                   .httpStatus(HttpStatus.NOT_FOUND)
+                   .message(e.getMessage())
+                   .build();
+       }
     }
 }

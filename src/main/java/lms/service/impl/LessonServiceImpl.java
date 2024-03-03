@@ -35,15 +35,23 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public SimpleResponse saveLesson(Long courseId, SaveLessonRequest saveLessonRequest) {
-        Course course = courseRepo.findById(courseId)
-                .orElseThrow(() ->
-                        new NoSuchElementException("Course with id: " + courseId + " not found"));
-        Lesson lesson = new Lesson();
-        lesson.setLessonName(saveLessonRequest.lessonName());
-        course.addLesson(lesson);
-        lesson.setCourse(course);
-        lessonRepo.save(lesson);
-        return new SimpleResponse(HttpStatus.OK, "successfully saved");
+        try {
+            Course course = courseRepo.findById(courseId)
+                    .orElseThrow(() ->
+                            new NoSuchElementException("Course with id: " + courseId + " not found"));
+            Lesson lesson = new Lesson();
+            lesson.setLessonName(saveLessonRequest.lessonName());
+            course.addLesson(lesson);
+            lesson.setCourse(course);
+            lessonRepo.save(lesson);
+            return new SimpleResponse(HttpStatus.OK, "successfully saved");
+        }catch (Exception e){
+            return SimpleResponse
+                    .builder()
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .message(e.getMessage())
+                    .build();
+        }
     }
 
     @Override
@@ -54,16 +62,32 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public SimpleResponse updateLesson(Long lessonId, EditLessonRequest editLessonRequest) {
-        Lesson lesson = checkId(lessonId);
-        lesson.setLessonName(editLessonRequest.lessonName());
-        lessonRepo.save(lesson);
-        return new SimpleResponse(HttpStatus.OK, "successfully updated");
+        try {
+            Lesson lesson = checkId(lessonId);
+            lesson.setLessonName(editLessonRequest.lessonName());
+            lessonRepo.save(lesson);
+            return new SimpleResponse(HttpStatus.OK, "successfully updated");
+        }catch (Exception e){
+            return SimpleResponse
+                    .builder()
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .message(e.getMessage())
+                    .build();
+        }
     }
 
     @Override
     public SimpleResponse deleteById(Long lessonId) {
-        Lesson lesson = checkId(lessonId);
-        lessonRepo.delete(lesson);
-        return new SimpleResponse(HttpStatus.OK, "successfully deleted");
+        try {
+            Lesson lesson = checkId(lessonId);
+            lessonRepo.delete(lesson);
+            return new SimpleResponse(HttpStatus.OK, "successfully deleted");
+        }catch (Exception e){
+            return SimpleResponse
+                    .builder()
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .message(e.getMessage())
+                    .build();
+        }
     }
 }

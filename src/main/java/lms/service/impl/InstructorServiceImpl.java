@@ -8,6 +8,7 @@ import lms.dto.response.InstructorInfosResponse;
 import lms.dto.response.SimpleResponse;
 import lms.entities.*;
 import lms.repository.CompanyRepository;
+import lms.repository.CourseRepository;
 import lms.repository.InstructorRepository;
 import lms.service.InstructorService;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import java.util.NoSuchElementException;
 public class InstructorServiceImpl implements InstructorService {
     private final InstructorRepository instructorRepo;
     private final CompanyRepository companyRepo;
+    private final CourseRepository courseRepo;
 
     private Instructor checkId(Long inId){
         return instructorRepo.findById(inId)
@@ -53,31 +55,55 @@ public class InstructorServiceImpl implements InstructorService {
 
     @Override
     public SimpleResponse updateInstructor(Long inId, UpdateInstructorRequest updateInstructor) {
-        Instructor instructor = checkId(inId);
-        instructor.setLastName(updateInstructor.lastName());
-        instructor.setFirstName(updateInstructor.firstName());
-        instructor.setPhoneNumber(updateInstructor.phoneNumber());
-        instructor.setSpecialization(updateInstructor.specialization());
-        instructorRepo.save(instructor);
-        return new SimpleResponse(HttpStatus.OK, "successfully updated");
+        try {
+            Instructor instructor = checkId(inId);
+            instructor.setLastName(updateInstructor.lastName());
+            instructor.setFirstName(updateInstructor.firstName());
+            instructor.setPhoneNumber(updateInstructor.phoneNumber());
+            instructor.setSpecialization(updateInstructor.specialization());
+            instructorRepo.save(instructor);
+            return new SimpleResponse(HttpStatus.OK, "successfully updated");
+        }catch (Exception e){
+            return SimpleResponse
+                    .builder()
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .message(e.getMessage())
+                    .build();
+        }
     }
 
     @Override
     public SimpleResponse deleteById(Long inId) {
-        Instructor instructor = checkId(inId);
-        instructorRepo.delete(instructor);
-        return new SimpleResponse(HttpStatus.OK, "successfully deleted");
+        try {
+            Instructor instructor = checkId(inId);
+            instructorRepo.delete(instructor);
+            return new SimpleResponse(HttpStatus.OK, "successfully deleted");
+        }catch (Exception e){
+            return SimpleResponse
+                    .builder()
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .message(e.getMessage())
+                    .build();
+        }
     }
 
     @Override @Transactional
     public SimpleResponse assignInstructorToCompany(Long companyId, Long instructorId) {
-        Instructor instructor = checkId(instructorId);
-        Company company = companyRepo.findById(companyId)
-                .orElseThrow(() ->
-                        new NoSuchElementException("Company with id: " + companyId + " not found"));
-        instructor.addCompany(company);
-        company.addInstructor(instructor);
-        return new SimpleResponse(HttpStatus.OK, "successfully assigned");
+        try {
+            Instructor instructor = checkId(instructorId);
+            Company company = companyRepo.findById(companyId)
+                    .orElseThrow(() ->
+                            new NoSuchElementException("Company with id: " + companyId + " not found"));
+            instructor.addCompany(company);
+            company.addInstructor(instructor);
+            return new SimpleResponse(HttpStatus.OK, "successfully assigned");
+        }catch (Exception e){
+            return SimpleResponse
+                    .builder()
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .message(e.getMessage())
+                    .build();
+        }
     }
 
     @Override
@@ -91,16 +117,34 @@ public class InstructorServiceImpl implements InstructorService {
         InstructorInfosResponse instructorInfosResponse = instructorRepo.instructorWIthInfos(inId);
 
         Map<String, Integer> groupNameWithStudents = instructorInfosResponse.getGroupNameWithStudent();
-
         List<Course> courses = instructor.getCourses();
 
         for (Course course : courses) {
             for (Group group : course.getGroups()) {
-                for (Student student : group.getStudents()) {
-                    groupNameWithStudents.put(group.getGroupName(), Math.toIntExact(student.getId()));
-                }
+                int count = 0;
+                count += group.getStudents().size();
+                groupNameWithStudents.put(group.getGroupName(), count);
             }
         }
         return instructorInfosResponse;
+    }
+
+    @Override @Transactional
+    public SimpleResponse assignInToCourse(Long courseId, Long inId) {
+        try {
+            Instructor instructor = checkId(inId);
+            Course course = courseRepo.findById(courseId)
+                    .orElseThrow(() ->
+                            new NoSuchElementException("Course with id: " + courseId + " not found"));
+            instructor.addCourse(course);
+            course.setInstructor(instructor);
+            return new SimpleResponse(HttpStatus.OK, "successfully assigned Instructor to course");
+        }catch (Exception e){
+            return SimpleResponse
+                    .builder()
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .message(e.getMessage())
+                    .build();
+        }
     }
 }

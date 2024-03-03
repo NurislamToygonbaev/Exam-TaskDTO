@@ -36,17 +36,25 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public SimpleResponse saveCourseTOCompany(Long companyId, SaveCourseRequest saveCourseRequest) {
-        Company company = companyRepo.findById(companyId)
-                .orElseThrow(() ->
-                        new NoSuchElementException("Company with id: " + companyId + " not found"));
-        Course course = new Course();
-        course.setCourseName(saveCourseRequest.courseName());
-        course.setDateOfStart(saveCourseRequest.dateOfStart());
-        course.setDescription(saveCourseRequest.description());
-        course.setCompany(company);
-        company.addCourses(course);
-        courseRepo.save(course);
-        return new SimpleResponse(HttpStatus.OK, "Course successfully saved");
+        try {
+            Company company = companyRepo.findById(companyId)
+                    .orElseThrow(() ->
+                            new NoSuchElementException("Company with id: " + companyId + " not found"));
+            Course course = new Course();
+            course.setCourseName(saveCourseRequest.courseName());
+            course.setDateOfStart(saveCourseRequest.dateOfStart());
+            course.setDescription(saveCourseRequest.description());
+            course.setCompany(company);
+            company.addCourses(course);
+            courseRepo.save(course);
+            return new SimpleResponse(HttpStatus.OK, "Course successfully saved");
+        }catch (Exception e){
+            return SimpleResponse
+                    .builder()
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .message(e.getMessage())
+                    .build();
+        }
     }
 
     @Override
@@ -57,24 +65,40 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public SimpleResponse updateCourse(Long courseId, EditCourseRequest editCourse) {
-        Course course = checkCourseId(courseId);
-        course.setCourseName(editCourse.courseName());
-        course.setDateOfStart(editCourse.dateOfStart());
-        course.setDescription(editCourse.description());
-        courseRepo.save(course);
-        return new SimpleResponse(HttpStatus.OK, "successfully updated");
+        try {
+            Course course = checkCourseId(courseId);
+            course.setCourseName(editCourse.courseName());
+            course.setDateOfStart(editCourse.dateOfStart());
+            course.setDescription(editCourse.description());
+            courseRepo.save(course);
+            return new SimpleResponse(HttpStatus.OK, "successfully updated");
+        }catch (Exception e){
+            return SimpleResponse
+                    .builder()
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .message(e.getMessage())
+                    .build();
+        }
     }
 
     @Override
     public SimpleResponse deleteCourseById(Long courseId) {
-        Course course = checkCourseId(courseId);
-        courseRepo.delete(course);
-        return new SimpleResponse(HttpStatus.OK, "successfully deleted");
+        try {
+            Course course = checkCourseId(courseId);
+            courseRepo.delete(course);
+            return new SimpleResponse(HttpStatus.OK, "successfully deleted");
+        }catch (Exception e){
+           return SimpleResponse
+                    .builder()
+                    .httpStatus(HttpStatus.ACCEPTED)
+                    .message(e.getMessage())
+                    .build();
+        }
     }
 
     @Override
     public List<GetCourseResponse> softCourseByDate(String ascOrDesc) {
-        if (ascOrDesc.contains("a%")){
+        if (ascOrDesc.contains("asc")){
             return courseRepo.sortCourseByDate();
         }else {
             return courseRepo.sortCourseByDateDesc();

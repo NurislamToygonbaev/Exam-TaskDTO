@@ -18,7 +18,7 @@ public class InstructorInfosResponse {
     private String firstName;
     private String phoneNumber;
     private Specialization specialization;
-    private Map<String, Integer> groupNameWithStudent = new HashMap<>();
+    private Map<String, Integer>  groupNameWithStudent = new HashMap<>();
 
     public InstructorInfosResponse(Long id, String lastName, String firstName, String phoneNumber, Specialization specialization) {
         this.id = id;
