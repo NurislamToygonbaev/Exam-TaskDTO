@@ -7,6 +7,7 @@ import lms.dto.response.GetCourseResponse;
 import lms.dto.response.SimpleResponse;
 import lms.entities.Company;
 import lms.entities.Course;
+import lms.exceptions.MyException;
 import lms.repository.CompanyRepository;
 import lms.repository.CourseRepository;
 import lms.service.CourseService;
@@ -23,10 +24,10 @@ public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepo;
     private final CompanyRepository companyRepo;
 
-    private Course checkCourseId(Long courseId){
+    private Course checkCourseId(Long courseId) {
         return courseRepo.findById(courseId)
                 .orElseThrow(() ->
-                        new NoSuchElementException("Course with id: "+courseId+" not found"));
+                        new NoSuchElementException("Course with id: " + courseId + " not found"));
     }
 
     @Override
@@ -48,7 +49,7 @@ public class CourseServiceImpl implements CourseService {
             company.addCourses(course);
             courseRepo.save(course);
             return new SimpleResponse(HttpStatus.OK, "Course successfully saved");
-        }catch (Exception e){
+        } catch (Exception e) {
             return SimpleResponse
                     .builder()
                     .httpStatus(HttpStatus.NOT_FOUND)
@@ -59,8 +60,21 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public GetCourseResponse findCourseById(Long courseId) {
-        checkCourseId(courseId);
-        return courseRepo.findCourseById(courseId);
+//        try {
+//            checkCourseId(courseId);
+//        }catch (Exception e){
+//
+//        }
+
+        GetCourseResponse courseResponse = null;
+        try {
+            courseResponse = courseRepo.findCourseById(courseId).orElseThrow(
+                    () -> new MyException("Course not found!")
+            );
+        } catch (MyException e) {
+            System.out.println(e.getMessage());
+        }
+        return courseResponse;
     }
 
     @Override
@@ -72,7 +86,7 @@ public class CourseServiceImpl implements CourseService {
             course.setDescription(editCourse.description());
             courseRepo.save(course);
             return new SimpleResponse(HttpStatus.OK, "successfully updated");
-        }catch (Exception e){
+        } catch (Exception e) {
             return SimpleResponse
                     .builder()
                     .httpStatus(HttpStatus.NOT_FOUND)
@@ -87,8 +101,8 @@ public class CourseServiceImpl implements CourseService {
             Course course = checkCourseId(courseId);
             courseRepo.delete(course);
             return new SimpleResponse(HttpStatus.OK, "successfully deleted");
-        }catch (Exception e){
-           return SimpleResponse
+        } catch (Exception e) {
+            return SimpleResponse
                     .builder()
                     .httpStatus(HttpStatus.ACCEPTED)
                     .message(e.getMessage())
@@ -98,9 +112,9 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public List<GetCourseResponse> softCourseByDate(String ascOrDesc) {
-        if (ascOrDesc.contains("asc")){
+        if (ascOrDesc.contains("asc")) {
             return courseRepo.sortCourseByDate();
-        }else {
+        } else {
             return courseRepo.sortCourseByDateDesc();
         }
     }

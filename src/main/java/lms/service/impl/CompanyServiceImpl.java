@@ -9,6 +9,7 @@ import lms.dto.response.SimpleResponse;
 import lms.entities.*;
 import lms.exceptions.MyException;
 import lms.repository.CompanyRepository;
+import lms.repository.GroupRepository;
 import lms.service.CompanyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ import java.util.NoSuchElementException;
 public class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository companyRepo;
+    private final GroupRepository groupRepo;
 
     private void checkName(String name) throws MyException {
         boolean exists = companyRepo.existsByName(name);
@@ -87,6 +89,16 @@ public class CompanyServiceImpl implements CompanyService {
     public SimpleResponse deleteCompanyById(Long companyId) {
         try {
             Company company = checkId(companyId);
+
+            for (Course cours : company.getCourses()) {
+                groupRepo.deleteAll(cours.getGroups());
+            }
+
+            for (Instructor instructor : company.getInstructors()) {
+                instructor.getCompanies().remove(company);
+            }
+
+
             companyRepo.delete(company);
             return new SimpleResponse(HttpStatus.OK, "Successfully deleted");
         }catch (Exception e){

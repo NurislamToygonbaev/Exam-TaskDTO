@@ -10,6 +10,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static jakarta.persistence.CascadeType.REMOVE;
+
 @Entity
 @Table(name = "courses")
 @Getter
@@ -28,13 +30,13 @@ public class Course {
     @ManyToOne
     private Company company;
 
-    @ManyToMany(mappedBy = "courses", cascade = CascadeType.DETACH)
+    @ManyToMany(mappedBy = "courses")
     private List<Group> groups;
 
     @ManyToOne(cascade = CascadeType.DETACH)
     private Instructor instructor;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "course", cascade = REMOVE)
     private List<Lesson> lessons;
 
 

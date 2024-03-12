@@ -25,7 +25,7 @@ public class Group {
     private String imageLink;
     private String description;
 
-    @ManyToMany(cascade = CascadeType.DETACH)
+    @ManyToMany
     private List<Course> courses;
 
     @OneToMany(mappedBy = "group", cascade = CascadeType.REMOVE)

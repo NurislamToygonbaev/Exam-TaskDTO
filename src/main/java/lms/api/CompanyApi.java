@@ -45,6 +45,7 @@ public class CompanyApi {
 
     @GetMapping("/CompanyWithInfo/{companyId}")
     public CompanyWithInfo companyWithInfo(@PathVariable Long companyId){
+
         return companyService.companyWithInfo(companyId);
     }
 }

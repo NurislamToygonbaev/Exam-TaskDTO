@@ -7,13 +7,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CourseRepository extends JpaRepository<Course, Long> {
     @Query("select new lms.dto.response.FindAllCoursesResponse(c.id, c.courseName, c.dateOfStart, c.description) from Course c")
     List<FindAllCoursesResponse> findAllCourses();
 
     @Query("select new lms.dto.response.GetCourseResponse(c.id, c.courseName, c.dateOfStart, c.description) from Course c where c.id = :courseId")
-    GetCourseResponse findCourseById(Long courseId);
+    Optional<GetCourseResponse> findCourseById(Long courseId);
 
     @Query("select c from Course c where c.id in (:courseIds)")
     List<Course> findCoursesWithIds(List<Long> courseIds);
