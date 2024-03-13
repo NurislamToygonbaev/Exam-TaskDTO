@@ -9,7 +9,7 @@ import lms.dto.response.SimpleResponse;
 import java.util.List;
 
 public interface TaskService {
-    List<ALlTasksResponse> findAll();
+    List<ALlTasksResponse> findAll(Long lessonId);
 
     SimpleResponse saveTask(Long lessonId, SaveTaskRequest saveTaskRequest);
 

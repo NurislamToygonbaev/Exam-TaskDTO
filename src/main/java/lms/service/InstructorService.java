@@ -4,6 +4,7 @@ import lms.dto.request.SaveInstructorRequest;
 import lms.dto.request.UpdateInstructorRequest;
 import lms.dto.response.GetAllInstructorsResponse;
 import lms.dto.response.InstructorInfosResponse;
+import lms.dto.response.SignResponse;
 import lms.dto.response.SimpleResponse;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
 public interface InstructorService {
     List<GetAllInstructorsResponse> findAll();
 
-    SimpleResponse saveInstructor(SaveInstructorRequest saveInstructorRequest);
+    SignResponse saveInstructor(SaveInstructorRequest saveInstructorRequest);
 
     GetAllInstructorsResponse findById(Long inId);
 

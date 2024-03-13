@@ -13,6 +13,7 @@ import lms.repository.CourseRepository;
 import lms.service.CourseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,8 +32,8 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public List<FindAllCoursesResponse> findAll() {
-        return courseRepo.findAllCourses();
+    public List<FindAllCoursesResponse> findAll(Long companyId) {
+        return courseRepo.findAllCourses(companyId);
     }
 
     @Override

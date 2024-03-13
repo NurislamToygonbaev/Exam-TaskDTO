@@ -1,20 +1,26 @@
 package lms.service.impl;
 
 import jakarta.transaction.Transactional;
+import lms.config.jwt.JwtService;
 import lms.dto.request.EditStudentRequest;
 import lms.dto.request.SaveStudentRequest;
 import lms.dto.response.AllStudentsResponse;
 import lms.dto.response.GetStudentResponse;
+import lms.dto.response.SignResponse;
 import lms.dto.response.SimpleResponse;
 import lms.entities.Group;
 import lms.entities.Student;
+import lms.entities.User;
+import lms.entities.enums.Role;
 import lms.entities.enums.StudyFormat;
 import lms.exceptions.MyException;
 import lms.repository.GroupRepository;
 import lms.repository.StudentRepository;
+import lms.repository.UserRepository;
 import lms.service.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -27,9 +33,12 @@ import java.util.stream.Collectors;
 public class StudentServiceImpl implements StudentService {
     private final StudentRepository studentRepo;
     private final GroupRepository groupRepo;
+    private final UserRepository userRepo;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     private void checkEmail(String email) throws MyException {
-        boolean exists = studentRepo.existsByEmail(email);
+        boolean exists = userRepo.existsByEmail(email);
         if (exists) throw new MyException("student with email: " + email + " already exists");
     }
 
@@ -45,21 +54,39 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public SimpleResponse saveStudent(SaveStudentRequest saveStudentRequest) {
+    public SignResponse saveStudent(SaveStudentRequest saveStudentRequest) {
         try {
             checkEmail(saveStudentRequest.email());
             Student student = new Student();
             student.setLastName(saveStudentRequest.lastName());
             student.setFirstName(saveStudentRequest.firstName());
-            student.setEmail(saveStudentRequest.email());
             student.setPhoneNumber(saveStudentRequest.phoneNumber());
             student.setStudyFormat(saveStudentRequest.studyFormat());
+
+            User user = new User();
+            user.setEmail(saveStudentRequest.email());
+            user.setPassword(passwordEncoder.encode(saveStudentRequest.password()));
+            user.setRole(Role.STUDENT);
+
+            student.setUser(user);
+
             studentRepo.save(student);
-            return new SimpleResponse(HttpStatus.OK, "successfully saved");
+
+            return SignResponse.builder()
+                    .token(jwtService.createToken(user))
+                    .simpleResponse(SimpleResponse.builder()
+                            .httpStatus(HttpStatus.OK)
+                            .message("student successfully saved")
+                            .build())
+                    .build();
         } catch (MyException e) {
-            return SimpleResponse.builder()
-                    .httpStatus(HttpStatus.NOT_FOUND)
-                    .message("error")
+            return SignResponse.builder()
+                    .simpleResponse(
+                            SimpleResponse.builder()
+                                    .httpStatus(HttpStatus.NOT_FOUND)
+                                    .message("error")
+                                    .build()
+                    )
                     .build();
         }
     }
@@ -76,7 +103,6 @@ public class StudentServiceImpl implements StudentService {
             checkEmail(editStudentRequest.email());
             Student student = checkId(studentId);
             student.setFirstName(editStudentRequest.firstName());
-            student.setEmail(editStudentRequest.email());
             student.setPhoneNumber(editStudentRequest.phoneNumber());
             student.setStudyFormat(editStudentRequest.studyFormat());
             student.setLastName(editStudentRequest.lastName());

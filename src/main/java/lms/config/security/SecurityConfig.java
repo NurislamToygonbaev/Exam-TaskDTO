@@ -1,5 +1,6 @@
 package lms.config.security;
 import lms.config.jwt.JwtFilter;
+
 import lms.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -36,14 +37,16 @@ public class SecurityConfig {
                     .authenticated();
         });
         http.csrf(AbstractHttpConfigurer::disable);
-//        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return email -> userRepository.findByEmail(email).orElseThrow(() ->
+       return email -> userRepository.findByEmail(email).orElseThrow(() ->
                 new UsernameNotFoundException("User with email: " + " not exists"));
+
+
     }
 
     @Bean

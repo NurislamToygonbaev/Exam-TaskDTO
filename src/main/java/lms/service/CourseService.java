@@ -9,7 +9,7 @@ import lms.dto.response.SimpleResponse;
 import java.util.List;
 
 public interface CourseService {
-    List<FindAllCoursesResponse> findAll();
+    List<FindAllCoursesResponse> findAll(Long companyId);
 
     SimpleResponse saveCourseTOCompany(Long companyId, SaveCourseRequest saveCourseRequest);
 

@@ -19,7 +19,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Student implements UserDetails {
+public class Student{
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "student_seq")
     @SequenceGenerator(name = "student_seq", allocationSize = 1)
@@ -27,10 +27,6 @@ public class Student implements UserDetails {
     private String lastName;
     private String firstName;
     private String phoneNumber;
-    private String email;
-    private String password;
-    @Enumerated(EnumType.STRING)
-    private Role role;
     @Enumerated(EnumType.STRING)
     private StudyFormat studyFormat;
     private boolean block = true;
@@ -38,37 +34,6 @@ public class Student implements UserDetails {
     @ManyToOne(cascade = CascadeType.DETACH)
     private Group group;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(role);
-    }
-
-    @Override
-    public String getPassword(){
-        return password;
-    }
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    private User user;
 }

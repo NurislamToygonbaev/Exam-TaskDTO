@@ -8,7 +8,7 @@ import lms.dto.response.SimpleResponse;
 import java.util.List;
 
 public interface LessonService {
-    List<AllLessonsResponse> findAll();
+    List<AllLessonsResponse> findAll(Long courseId);
 
     SimpleResponse saveLesson(Long courseId, SaveLessonRequest saveLessonRequest);
 

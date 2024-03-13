@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface LessonRepository extends JpaRepository<Lesson, Long> {
-    @Query("select new lms.dto.response.AllLessonsResponse(l.id, l.lessonName) from Lesson l")
-    List<AllLessonsResponse> findAllLesson();
+    @Query("select new lms.dto.response.AllLessonsResponse(l.id, l.lessonName) from Lesson l where l.course.id =:courseId")
+    List<AllLessonsResponse> findAllLesson(Long courseId);
 
     @Query("select new lms.dto.response.AllLessonsResponse(l.id, l.lessonName) from Lesson l where l.id =:lessonId")
     AllLessonsResponse findLessonById(Long lessonId);

@@ -7,6 +7,8 @@ import lombok.Builder;
 public record SaveInstructorRequest(
         String lastName,
         String firstName,
+        String email,
+        String password,
         String phoneNumber,
         Specialization specialization
 ) {

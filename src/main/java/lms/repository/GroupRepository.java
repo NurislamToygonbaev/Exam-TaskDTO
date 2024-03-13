@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface GroupRepository extends JpaRepository<Group, Long> {
-    @Query("select new lms.dto.response.FindAllGroups(g.id, g.groupName, g.imageLink, g.description) from Group g")
-    List<FindAllGroups> findAllGroups();
+    @Query("select new lms.dto.response.FindAllGroups(g.id, g.groupName, g.imageLink, g.description) from Group g join g.courses c where c.company.id =:companyId")
+    List<FindAllGroups> findAllGroups(Long companyId);
 
     @Query("select new lms.dto.response.FindAllGroups(g.id, g.groupName, g.imageLink, g.description) from Group g where g.id = :groupId")
     FindAllGroups getGroupById(Long groupId);

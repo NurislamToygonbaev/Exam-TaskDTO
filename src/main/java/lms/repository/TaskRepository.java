@@ -9,8 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface TaskRepository extends JpaRepository<Task, Long> {
-    @Query("select new lms.dto.response.ALlTasksResponse(t.id, t.taskName, t.taskText, t.deadLine) from Task t")
-    List<ALlTasksResponse> findTasks();
+    @Query("select new lms.dto.response.ALlTasksResponse(t.id, t.taskName, t.taskText, t.deadLine) from Task t where t.lesson.id =:lessonId")
+    List<ALlTasksResponse> findTasks(Long lessonId);
     @Query("select new lms.dto.response.FIndTaskResponse(t.id, t.taskName, t.taskText, t.deadLine) from Task t where t.id =:taskId")
     FIndTaskResponse findTaskById(Long taskId);
 }

@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CourseRepository extends JpaRepository<Course, Long> {
-    @Query("select new lms.dto.response.FindAllCoursesResponse(c.id, c.courseName, c.dateOfStart, c.description) from Course c")
-    List<FindAllCoursesResponse> findAllCourses();
+    @Query("select new lms.dto.response.FindAllCoursesResponse(c.id, c.courseName, c.dateOfStart, c.description) from Course c where c.company.id =:companyId")
+    List<FindAllCoursesResponse> findAllCourses(Long companyId);
 
     @Query("select new lms.dto.response.GetCourseResponse(c.id, c.courseName, c.dateOfStart, c.description) from Course c where c.id = :courseId")
     Optional<GetCourseResponse> findCourseById(Long courseId);

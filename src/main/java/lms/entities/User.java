@@ -20,7 +20,6 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
     @SequenceGenerator(name = "user_seq", allocationSize = 1)
     private Long id;
-    private String fullName;
     private String email;
     private String password;
     @Enumerated(EnumType.STRING)

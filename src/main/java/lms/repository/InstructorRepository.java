@@ -3,10 +3,13 @@ package lms.repository;
 import lms.dto.response.GetAllInstructorsResponse;
 import lms.dto.response.InstructorInfosResponse;
 import lms.entities.Instructor;
+import lms.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 public interface InstructorRepository extends JpaRepository<Instructor, Long> {
     @Query("select new lms.dto.response.GetAllInstructorsResponse(i.id, i.lastName, i.firstName, i.phoneNumber, i.specialization) from Instructor i")

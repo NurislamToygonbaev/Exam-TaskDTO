@@ -29,8 +29,8 @@ public class TaskServiceImpl implements TaskService {
                         new NoSuchElementException("Task with id: "+taskId+" not found"));
     }
     @Override
-    public List<ALlTasksResponse> findAll() {
-        return taskRepo.findTasks();
+    public List<ALlTasksResponse> findAll(Long lessonId) {
+        return taskRepo.findTasks(lessonId);
     }
 
     @Override

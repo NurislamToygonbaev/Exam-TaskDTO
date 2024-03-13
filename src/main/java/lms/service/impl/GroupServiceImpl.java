@@ -28,8 +28,8 @@ public class GroupServiceImpl implements GroupService {
                         new NoSuchElementException("Group with Id: "+groupId+" not found"));
     }
     @Override
-    public List<FindAllGroups> findAll() {
-        return groupRepo.findAllGroups();
+    public List<FindAllGroups> findAll(Long companyId) {
+        return groupRepo.findAllGroups(companyId);
     }
 
     @Override

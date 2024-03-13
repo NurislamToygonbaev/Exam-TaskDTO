@@ -7,6 +7,7 @@ public record SaveStudentRequest(
         String firstName,
         String phoneNumber,
         String email,
+        String password,
         StudyFormat studyFormat
 ) {
 }

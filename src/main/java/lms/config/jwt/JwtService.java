@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import lms.entities.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -15,9 +16,10 @@ public class JwtService {
     @Value("${app.jwt.secret}")
     private String secretKey;
 
-    public String createToken(UserDetails userDetails){
+    public String createToken(User user){
         return JWT.create()
-                .withClaim("email", userDetails.getUsername())
+                .withClaim("email", user.getUsername())
+                .withClaim("role", user.getRole().name())
                 .withIssuedAt(ZonedDateTime.now().toInstant())
                 .withExpiresAt(ZonedDateTime.now().plusHours(1).toInstant())
                 .sign(Algorithm.HMAC512(secretKey));

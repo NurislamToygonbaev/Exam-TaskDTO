@@ -1,18 +1,22 @@
 package lms.service.impl;
 
 import jakarta.transaction.Transactional;
+import lms.config.jwt.JwtService;
 import lms.dto.request.SaveInstructorRequest;
 import lms.dto.request.UpdateInstructorRequest;
 import lms.dto.response.GetAllInstructorsResponse;
 import lms.dto.response.InstructorInfosResponse;
+import lms.dto.response.SignResponse;
 import lms.dto.response.SimpleResponse;
 import lms.entities.*;
+import lms.entities.enums.Role;
 import lms.repository.CompanyRepository;
 import lms.repository.CourseRepository;
 import lms.repository.InstructorRepository;
 import lms.service.InstructorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +29,8 @@ public class InstructorServiceImpl implements InstructorService {
     private final InstructorRepository instructorRepo;
     private final CompanyRepository companyRepo;
     private final CourseRepository courseRepo;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     private Instructor checkId(Long inId){
         return instructorRepo.findById(inId)
@@ -37,14 +43,29 @@ public class InstructorServiceImpl implements InstructorService {
     }
 
     @Override
-    public SimpleResponse saveInstructor(SaveInstructorRequest saveInstructorRequest) {
+    public SignResponse saveInstructor(SaveInstructorRequest saveInstructorRequest) {
         Instructor instructor = new Instructor();
         instructor.setLastName(saveInstructorRequest.lastName());
         instructor.setFirstName(saveInstructorRequest.firstName());
         instructor.setPhoneNumber(saveInstructorRequest.phoneNumber());
         instructor.setSpecialization(saveInstructorRequest.specialization());
+
+        User user = new User();
+        user.setEmail(saveInstructorRequest.email());
+        user.setPassword(passwordEncoder.encode(saveInstructorRequest.password()));
+        user.setRole(Role.INSTRUCTOR);
+
+        instructor.setUser(user);
         instructorRepo.save(instructor);
-        return new SimpleResponse(HttpStatus.OK, "Instructor Successfully saved");
+
+        return SignResponse.builder()
+                .token(jwtService.createToken(user))
+                .email(user.getEmail())
+                .simpleResponse(SimpleResponse.builder()
+                        .httpStatus(HttpStatus.OK)
+                        .message("Instructor successfully saved")
+                        .build())
+                .build();
     }
 
     @Override
@@ -136,9 +157,16 @@ public class InstructorServiceImpl implements InstructorService {
             Course course = courseRepo.findById(courseId)
                     .orElseThrow(() ->
                             new NoSuchElementException("Course with id: " + courseId + " not found"));
-            instructor.addCourse(course);
-            course.setInstructor(instructor);
-            return new SimpleResponse(HttpStatus.OK, "successfully assigned Instructor to course");
+
+            List<Company> companies = instructor.getCompanies();
+            for (Company company : companies) {
+                if (company.getId().equals(course.getCompany().getId())){
+                    instructor.addCourse(course);
+                    course.setInstructor(instructor);
+                    return new SimpleResponse(HttpStatus.OK,
+                            "successfully assigned Instructor to course");
+                }
+            }
         }catch (Exception e){
             return SimpleResponse
                     .builder()
@@ -146,5 +174,9 @@ public class InstructorServiceImpl implements InstructorService {
                     .message(e.getMessage())
                     .build();
         }
+
+
+        return new SimpleResponse(HttpStatus.OK,
+                "failed assign Instructor to course");
     }
 }

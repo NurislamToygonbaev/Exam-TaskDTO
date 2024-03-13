@@ -29,8 +29,8 @@ public class LessonServiceImpl implements LessonService {
                         new NoSuchElementException("Lesson with id: "+lessonId+" not found"));
     }
     @Override
-    public List<AllLessonsResponse> findAll() {
-        return lessonRepo.findAllLesson();
+    public List<AllLessonsResponse> findAll(Long courseId) {
+        return lessonRepo.findAllLesson(courseId);
     }
 
     @Override

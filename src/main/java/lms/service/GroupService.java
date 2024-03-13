@@ -8,7 +8,7 @@ import lms.dto.response.SimpleResponse;
 import java.util.List;
 
 public interface GroupService {
-    List<FindAllGroups> findAll();
+    List<FindAllGroups> findAll(Long companyId);
 
     SimpleResponse saveGroup(SaveGroupRequest saveGroupRequest);
 

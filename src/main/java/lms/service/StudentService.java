@@ -4,6 +4,7 @@ import lms.dto.request.EditStudentRequest;
 import lms.dto.request.SaveStudentRequest;
 import lms.dto.response.AllStudentsResponse;
 import lms.dto.response.GetStudentResponse;
+import lms.dto.response.SignResponse;
 import lms.dto.response.SimpleResponse;
 import lms.entities.enums.StudyFormat;
 
@@ -12,7 +13,7 @@ import java.util.List;
 public interface StudentService {
     List<AllStudentsResponse> findAll();
 
-    SimpleResponse saveStudent(SaveStudentRequest student);
+    SignResponse saveStudent(SaveStudentRequest student);
 
     GetStudentResponse findById(Long studentId);
 
